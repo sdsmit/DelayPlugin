@@ -154,7 +154,9 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData, true);
         
         getFromDelayBuffer(buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData, false);
+        if (*treeState.getRawParameterValue(MIX_ID) != 0) {
         feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
+        }
     }
     
     mWritePosition += bufferLength;
@@ -163,7 +165,7 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 }
 
 void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData, bool willReplace) {
-    auto rawGain = treeState.getRawParameterValue(FEEDBACK_LEVEL_ID);
+    auto rawGain = treeState.getRawParameterValue(MIX_ID);
     float gain = static_cast<float>(*rawGain);
     if (delayBufferLength > bufferLength + mWritePosition) {
         if (willReplace)
@@ -215,7 +217,7 @@ void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buf
 }
 
 void DelayPluginAudioProcessor::feedbackDelay(int channel, const int bufferLength, const int delayBufferLength, float * dryBuffer) {
-    auto param3 = float(*treeState.getRawParameterValue(MIX_ID));
+    auto param3 = float(*treeState.getRawParameterValue(FEEDBACK_LEVEL_ID));
     if (delayBufferLength > bufferLength + mWritePosition) {
         mDelayBuffer.addFromWithRamp(channel, mWritePosition, dryBuffer, bufferLength, param3, param3);
     }
