@@ -19,7 +19,8 @@ DelayPluginAudioProcessor::DelayPluginAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+treeState(*this, nullptr, "PARAMETERS", {std::make_unique<juce::AudioParameterInt>(DELAY_TIME_ID, DELAY_TIME_NAME, 0, 2000, 0), std::make_unique<juce::AudioParameterFloat>(FEEDBACK_LEVEL_ID, FEEDBACK_LEVEL_NAME, 0, 100, 0), std::make_unique<juce::AudioParameterFloat>(MIX_ID, MIX_NAME, 0, 100, 0)})
 #endif
 {
 }
@@ -172,7 +173,10 @@ void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLen
 }
 
 void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
-    int delayTime = 200;
+    
+    auto sliderDelayTime = treeState.getRawParameterValue(DELAY_TIME_ID);
+    int delayTime = int(*sliderDelayTime);
+    
     const int readPosition = static_cast<int>(delayBufferLength + mWritePosition - (mSampleRate * delayTime / 1000)) % delayBufferLength;
     
     if (delayBufferLength > bufferLength + readPosition) {

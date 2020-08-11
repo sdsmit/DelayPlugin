@@ -9,6 +9,12 @@
 #pragma once
 
 #include <JuceHeader.h>
+#define DELAY_TIME_ID "delay"
+#define DELAY_TIME_NAME "Delay"
+#define FEEDBACK_LEVEL_ID "feedback"
+#define FEEDBACK_LEVEL_NAME "Feedback"
+#define MIX_ID "mix"
+#define MIX_NAME "Mix"
 
 //==============================================================================
 /**
@@ -55,6 +61,7 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    juce::AudioProcessorValueTreeState treeState;
 
 private:
     juce::AudioBuffer<float> mDelayBuffer;
