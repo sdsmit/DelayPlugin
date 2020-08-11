@@ -58,6 +58,7 @@ public:
 private:
     juce::AudioBuffer<float> mDelayBuffer;
     int mWritePosition {0};
+    int mSampleRate {44100};
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayPluginAudioProcessor)
 };

@@ -95,6 +95,7 @@ void DelayPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     const int numInputChannels = getTotalNumInputChannels();
     const int delayBufferSize = 2 * (sampleRate + samplesPerBlock);
+    mSampleRate = sampleRate;
     
     
     mDelayBuffer.setSize(numInputChannels, delayBufferSize);
@@ -147,6 +148,7 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         const float* bufferData = buffer.getReadPointer(channel);
         const float* delayBufferData = mDelayBuffer.getReadPointer(channel);
         fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
+        getFromDelayBuffer(buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
     }
     
     mWritePosition += bufferLength;
@@ -167,6 +169,16 @@ void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLen
 
 void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
     int delayTime = 500;
+    const int readPosition = static_cast<int>(delayBufferLength + mWritePosition - (mSampleRate * delayTime / 1000)) % delayBufferLength;
+    
+    if (delayBufferLength > bufferLength + readPosition) {
+        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferLength);
+    }
+    else {
+        const int bufferRemaining = delayBufferLength - readPosition;
+        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
+        buffer.addFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+    }
 }
 
 //==============================================================================
