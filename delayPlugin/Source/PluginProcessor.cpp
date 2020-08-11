@@ -20,7 +20,8 @@ DelayPluginAudioProcessor::DelayPluginAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-treeState(*this, nullptr, "PARAMETERS", {std::make_unique<juce::AudioParameterInt>(DELAY_TIME_ID, DELAY_TIME_NAME, 0, 2000, 0), std::make_unique<juce::AudioParameterFloat>(FEEDBACK_LEVEL_ID, FEEDBACK_LEVEL_NAME, 0, 100, 0), std::make_unique<juce::AudioParameterFloat>(MIX_ID, MIX_NAME, 0, 100, 0)})
+treeState(*this, nullptr, "PARAMETERS", {std::make_unique<juce::AudioParameterInt>(DELAY_TIME_ID, DELAY_TIME_NAME, 0, 2000, 0), std::make_unique<juce::AudioParameterFloat>(FEEDBACK_LEVEL_ID, FEEDBACK_LEVEL_NAME, 0, 100, 0), std::make_unique<juce::AudioParameterFloat>(MIX_ID, MIX_NAME, 0, 100, 0),
+})
 #endif
 {
 }
@@ -161,7 +162,8 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 }
 
 void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
-    const float gain = 0.3;
+    auto rawGain = treeState.getRawParameterValue(FEEDBACK_LEVEL_ID);
+    float gain = static_cast<float>(*rawGain);
     if (delayBufferLength > bufferLength + mWritePosition) {
         mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferLength, gain, gain);
     }
@@ -190,15 +192,15 @@ void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buf
 }
 
 void DelayPluginAudioProcessor::feedbackDelay(int channel, const int bufferLength, const int delayBufferLength, float * dryBuffer) {
-    
+    auto param3 = float(*treeState.getRawParameterValue(MIX_ID));
     if (delayBufferLength > bufferLength + mWritePosition) {
-        mDelayBuffer.addFromWithRamp(channel, mWritePosition, dryBuffer, bufferLength, 0.8, 0.8);
+        mDelayBuffer.addFromWithRamp(channel, mWritePosition, dryBuffer, bufferLength, param3, param3);
     }
     else {
         const int bufferRemaining = delayBufferLength - mWritePosition;
         
-        mDelayBuffer.addFromWithRamp(channel, bufferRemaining, dryBuffer, bufferRemaining, 0.8, 0.8);
-        mDelayBuffer.addFromWithRamp(channel, 0, dryBuffer, bufferLength - bufferRemaining, 0.8, 0.8);
+        mDelayBuffer.addFromWithRamp(channel, bufferRemaining, dryBuffer, bufferRemaining, param3, param3);
+        mDelayBuffer.addFromWithRamp(channel, 0, dryBuffer, bufferLength - bufferRemaining, param3, param3);
     }
 }
 

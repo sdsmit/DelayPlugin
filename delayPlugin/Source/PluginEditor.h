@@ -29,7 +29,11 @@ private:
     // access the processor object that created it.
     DelayPluginAudioProcessor& audioProcessor;
     juce::Slider delayValueSlider;
+    juce::Slider feedbackValueSlider;
+    juce::Slider mixValueSlider;
 public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delayTimeValue;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> feedbackTimeValue;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixValue;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayPluginAudioProcessorEditor)
 };
