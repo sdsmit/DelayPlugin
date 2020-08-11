@@ -163,7 +163,7 @@ void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLen
     else {
         const int bufferRemaining = delayBufferLength - mWritePosition;
         mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, 0.8, 0.8);
-        mDelayBuffer.copyFromWithRamp(channel, 0, bufferData, bufferLength - bufferRemaining, 0.8, 0.8);
+        mDelayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, 0.8, 0.8);
     }
 }
 
