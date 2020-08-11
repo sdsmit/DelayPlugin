@@ -31,8 +31,6 @@ private:
     juce::Slider delayValueSlider;
     juce::Slider feedbackValueSlider;
     juce::Slider mixValueSlider;
-    juce::Label delayLabel;
-    juce::Label feedbackLabel;
 public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delayTimeValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> feedbackTimeValue;

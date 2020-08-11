@@ -21,8 +21,6 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     
     setSize (400, 300);
     addAndMakeVisible(delayValueSlider);
-    addAndMakeVisible(delayLabel);
-    delayLabel.setText("delay time", juce::NotificationType::dontSendNotification);
     delayValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     delayValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
     delayValueSlider.setTextValueSuffix("ms");
@@ -32,13 +30,13 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     feedbackValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     feedbackValueSlider.setTextValueSuffix("%");
     feedbackValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
-    feedbackValueSlider.setRange(0, 1);
+    feedbackValueSlider.setRange(0, .99);
     
     addAndMakeVisible(mixValueSlider);
     mixValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     mixValueSlider.setTextValueSuffix("%");
     mixValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
-    mixValueSlider.setRange(0, .8);
+    mixValueSlider.setRange(0, 1);
 }
 
 DelayPluginAudioProcessorEditor::~DelayPluginAudioProcessorEditor()
@@ -53,7 +51,6 @@ void DelayPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
 void DelayPluginAudioProcessorEditor::resized()
 {
-    delayLabel.setBounds(0, getHeight(), getWidth()/3, getHeight() / 5);
     delayValueSlider.setBounds(0, 0, getWidth() / 3, getHeight());
     feedbackValueSlider.setBounds(getWidth()/3, 0, getWidth()/3, getHeight());
     mixValueSlider.setBounds(getWidth()/3 * 2, 0, getWidth()/3, getHeight());
