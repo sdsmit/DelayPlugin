@@ -151,8 +151,9 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         const float* delayBufferData = mDelayBuffer.getReadPointer(channel);
         float * dryBuffer = buffer.getWritePointer(channel);
         
-        fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
-        getFromDelayBuffer(buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
+        fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData, true);
+        
+        getFromDelayBuffer(buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData, false);
         feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
     }
     
@@ -161,20 +162,30 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     mWritePosition = mWritePosition % delayBufferLength;
 }
 
-void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
+void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData, bool willReplace) {
     auto rawGain = treeState.getRawParameterValue(FEEDBACK_LEVEL_ID);
     float gain = static_cast<float>(*rawGain);
     if (delayBufferLength > bufferLength + mWritePosition) {
+        if (willReplace)
         mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferLength, gain, gain);
+        else
+        mDelayBuffer.addFromWithRamp(channel, mWritePosition, bufferData, bufferLength, gain, gain);
     }
     else {
-        const int bufferRemaining = delayBufferLength - mWritePosition;
-        mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, gain, gain);
-        mDelayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, gain, gain);
+        if (willReplace) {
+            const int bufferRemaining = delayBufferLength - mWritePosition;
+            mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, gain, gain);
+            mDelayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, gain, gain);
+        }
+        else {
+            const int bufferRemaining = delayBufferLength - mWritePosition;
+            mDelayBuffer.addFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, gain, gain);
+            mDelayBuffer.addFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, gain, gain);
+        }
     }
 }
 
-void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
+void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData, bool willReplace) {
     
     auto sliderDelayTime = treeState.getRawParameterValue(DELAY_TIME_ID);
     int delayTime = int(*sliderDelayTime);
@@ -182,12 +193,24 @@ void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buf
     const int readPosition = static_cast<int>(delayBufferLength + mWritePosition - (mSampleRate * delayTime / 1000)) % delayBufferLength;
     
     if (delayBufferLength > bufferLength + readPosition) {
+        if (willReplace) {
         buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferLength);
+        }
+        else {
+        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferLength);
+        }
     }
     else {
+        if (willReplace) {
         const int bufferRemaining = delayBufferLength - readPosition;
         buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
         buffer.copyFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+        }
+        else {
+            const int bufferRemaining = delayBufferLength - readPosition;
+            buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
+            buffer.addFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+        }
     }
 }
 

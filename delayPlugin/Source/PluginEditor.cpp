@@ -30,13 +30,13 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     feedbackValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     feedbackValueSlider.setTextValueSuffix("%");
     feedbackValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
-    feedbackValueSlider.setRange(0, .8);
+    feedbackValueSlider.setRange(0, 1);
     
     addAndMakeVisible(mixValueSlider);
     mixValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     mixValueSlider.setTextValueSuffix("%");
     mixValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
-    mixValueSlider.setRange(0, 1);
+    mixValueSlider.setRange(0, .8);
 }
 
 DelayPluginAudioProcessorEditor::~DelayPluginAudioProcessorEditor()
