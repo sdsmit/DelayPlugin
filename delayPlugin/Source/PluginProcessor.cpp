@@ -147,8 +147,11 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         
         const float* bufferData = buffer.getReadPointer(channel);
         const float* delayBufferData = mDelayBuffer.getReadPointer(channel);
+        float * dryBuffer = buffer.getWritePointer(channel);
+        
         fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
         getFromDelayBuffer(buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
+        feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
     }
     
     mWritePosition += bufferLength;
@@ -157,27 +160,41 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 }
 
 void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
+    const float gain = 0.3;
     if (delayBufferLength > bufferLength + mWritePosition) {
-        mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferLength, 0.8, 0.8);
+        mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferLength, gain, gain);
     }
     else {
         const int bufferRemaining = delayBufferLength - mWritePosition;
-        mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, 0.8, 0.8);
-        mDelayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, 0.8, 0.8);
+        mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, gain, gain);
+        mDelayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, gain, gain);
     }
 }
 
 void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
-    int delayTime = 500;
+    int delayTime = 200;
     const int readPosition = static_cast<int>(delayBufferLength + mWritePosition - (mSampleRate * delayTime / 1000)) % delayBufferLength;
     
     if (delayBufferLength > bufferLength + readPosition) {
-        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferLength);
+        buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferLength);
     }
     else {
         const int bufferRemaining = delayBufferLength - readPosition;
-        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
-        buffer.addFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+        buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
+        buffer.copyFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+    }
+}
+
+void DelayPluginAudioProcessor::feedbackDelay(int channel, const int bufferLength, const int delayBufferLength, float * dryBuffer) {
+    
+    if (delayBufferLength > bufferLength + mWritePosition) {
+        mDelayBuffer.addFromWithRamp(channel, mWritePosition, dryBuffer, bufferLength, 0.8, 0.8);
+    }
+    else {
+        const int bufferRemaining = delayBufferLength - mWritePosition;
+        
+        mDelayBuffer.addFromWithRamp(channel, bufferRemaining, dryBuffer, bufferRemaining, 0.8, 0.8);
+        mDelayBuffer.addFromWithRamp(channel, 0, dryBuffer, bufferLength - bufferRemaining, 0.8, 0.8);
     }
 }
 
