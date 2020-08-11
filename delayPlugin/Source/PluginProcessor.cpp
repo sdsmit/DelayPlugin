@@ -139,19 +139,19 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        const int bufferLength = buffer.getNumSamples();
-        const int delayBufferLength = mDelayBuffer.getNumSamples();
+    const int bufferLength = buffer.getNumSamples();
+    const int delayBufferLength = mDelayBuffer.getNumSamples();
+    
+    for (int channel = 0; channel < totalNumInputChannels; ++channel) {
         
         const float* bufferData = buffer.getReadPointer(channel);
         const float* delayBufferData = mDelayBuffer.getReadPointer(channel);
-        
-        mWritePosition += bufferLength;
-        //wrap around when we get to the end of delay buffer
-        mWritePosition = mWritePosition % delayBufferLength;
-        
+        fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
     }
+    
+    mWritePosition += bufferLength;
+    //wrap around when we get to the end of delay buffer
+    mWritePosition = mWritePosition % delayBufferLength;
 }
 
 void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
@@ -163,6 +163,10 @@ void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLen
         mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, 0.8, 0.8);
         mDelayBuffer.copyFromWithRamp(channel, 0, bufferData, bufferLength - bufferRemaining, 0.8, 0.8);
     }
+}
+
+void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
+    int delayTime = 500;
 }
 
 //==============================================================================
