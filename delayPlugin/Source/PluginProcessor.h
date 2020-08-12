@@ -15,6 +15,8 @@
 #define FEEDBACK_LEVEL_NAME "Feedback"
 #define MIX_ID "mix"
 #define MIX_NAME "Mix"
+#define CLIP_ID "clip"
+#define CLIP_NAME "Clip"
 
 //==============================================================================
 /**
@@ -35,9 +37,10 @@ public:
    #endif
 
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
-    void fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData, bool willReplace);
-    void getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData, bool willReplace);
+    void fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData);
+    void getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData);
     void feedbackDelay(int channel, const int bufferLength, const int delayBufferLength, float * dryBuffer);
+    void saturate(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const float * bufferData, float clipThreshold);
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;

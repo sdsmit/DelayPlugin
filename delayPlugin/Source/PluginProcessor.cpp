@@ -20,7 +20,8 @@ DelayPluginAudioProcessor::DelayPluginAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-treeState(*this, nullptr, "PARAMETERS", {std::make_unique<juce::AudioParameterInt>(DELAY_TIME_ID, DELAY_TIME_NAME, 0, 2000, 0), std::make_unique<juce::AudioParameterFloat>(FEEDBACK_LEVEL_ID, FEEDBACK_LEVEL_NAME, 0, 100, 0), std::make_unique<juce::AudioParameterFloat>(MIX_ID, MIX_NAME, 0, 100, 0),
+treeState(*this, nullptr, "PARAMETERS", {std::make_unique<juce::AudioParameterInt>(DELAY_TIME_ID, DELAY_TIME_NAME, 0, 2000, 0), std::make_unique<juce::AudioParameterFloat>(FEEDBACK_LEVEL_ID, FEEDBACK_LEVEL_NAME, 0, 1, 0), std::make_unique<juce::AudioParameterFloat>(MIX_ID, MIX_NAME, 0, 1, 0),
+    std::make_unique<juce::AudioParameterFloat>(CLIP_ID, CLIP_NAME, 0, 1, 0)
 })
 #endif
 {
@@ -151,12 +152,14 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         const float* delayBufferData = mDelayBuffer.getReadPointer(channel);
         float * dryBuffer = buffer.getWritePointer(channel);
         
-        fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData, true);
+        fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
         
-        getFromDelayBuffer(buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData, false);
+        getFromDelayBuffer(buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
         if (*treeState.getRawParameterValue(MIX_ID) != 0) {
         feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
         }
+        auto clipThreshold = float(*treeState.getRawParameterValue(CLIP_ID));
+        saturate(buffer, channel, bufferLength, bufferData, clipThreshold);
     }
     
     mWritePosition += bufferLength;
@@ -164,30 +167,21 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     mWritePosition = mWritePosition % delayBufferLength;
 }
 
-void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData, bool willReplace) {
+
+void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
     auto rawGain = treeState.getRawParameterValue(MIX_ID);
     float gain = static_cast<float>(*rawGain);
     if (delayBufferLength > bufferLength + mWritePosition) {
-        if (willReplace)
         mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferLength, gain, gain);
-        else
-        mDelayBuffer.addFromWithRamp(channel, mWritePosition, bufferData, bufferLength, gain, gain);
     }
     else {
-        if (willReplace) {
-            const int bufferRemaining = delayBufferLength - mWritePosition;
-            mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, gain, gain);
-            mDelayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, gain, gain);
-        }
-        else {
-            const int bufferRemaining = delayBufferLength - mWritePosition;
-            mDelayBuffer.addFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, gain, gain);
-            mDelayBuffer.addFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, gain, gain);
-        }
+        const int bufferRemaining = delayBufferLength - mWritePosition;
+        mDelayBuffer.copyFromWithRamp(channel, mWritePosition, bufferData, bufferRemaining, gain, gain);
+        mDelayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, gain, gain);
     }
 }
 
-void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData, bool willReplace) {
+void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData) {
     
     auto sliderDelayTime = treeState.getRawParameterValue(DELAY_TIME_ID);
     int delayTime = int(*sliderDelayTime);
@@ -195,24 +189,12 @@ void DelayPluginAudioProcessor::getFromDelayBuffer(juce::AudioBuffer<float>& buf
     const int readPosition = static_cast<int>(delayBufferLength + mWritePosition - (mSampleRate * delayTime / 1000)) % delayBufferLength;
     
     if (delayBufferLength > bufferLength + readPosition) {
-        if (willReplace) {
-        buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferLength);
-        }
-        else {
         buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferLength);
-        }
     }
     else {
-        if (willReplace) {
         const int bufferRemaining = delayBufferLength - readPosition;
-        buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
-        buffer.copyFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
-        }
-        else {
-            const int bufferRemaining = delayBufferLength - readPosition;
-            buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
-            buffer.addFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
-        }
+        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
+        buffer.addFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
     }
 }
 
@@ -226,6 +208,28 @@ void DelayPluginAudioProcessor::feedbackDelay(int channel, const int bufferLengt
         
         mDelayBuffer.addFromWithRamp(channel, bufferRemaining, dryBuffer, bufferRemaining, param3, param3);
         mDelayBuffer.addFromWithRamp(channel, 0, dryBuffer, bufferLength - bufferRemaining, param3, param3);
+    }
+}
+
+void DelayPluginAudioProcessor::saturate(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const float * bufferData, float clipThreshold) {
+    for (int i = 0; i < bufferLength; i++) {
+        float newVal = 0;
+        float clipThresholdT2 = clipThreshold * 2;
+        float n = clipThreshold * 2.5;
+        
+        newVal = (*bufferData)/pow((1 + pow(abs((*bufferData)), n)), (1/n));
+        //soft clipping stage
+        if (newVal <= -clipThreshold) {
+            newVal = -2/3;
+        }
+        else if (newVal > -clipThreshold && newVal < clipThreshold) {
+            newVal = newVal - (pow(newVal, 3)/3);
+        }
+        else if (newVal >= clipThreshold) {
+            newVal = 2/3;
+        }
+        buffer.addSample(channel, i, newVal);
+        bufferData++;
     }
 }
 
