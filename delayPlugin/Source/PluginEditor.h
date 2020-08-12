@@ -1,4 +1,5 @@
 /*
+ built by sam smith - sdsmit@umich.edu
   ==============================================================================
 
     This file contains the basic framework code for a JUCE plugin editor.
@@ -14,7 +15,8 @@
 //==============================================================================
 /**
 */
-class DelayPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
+class DelayPluginAudioProcessorEditor  : public juce::AudioProcessorEditor,
+                                        public juce::Slider::Listener
 {
 public:
     DelayPluginAudioProcessorEditor (DelayPluginAudioProcessor&);
