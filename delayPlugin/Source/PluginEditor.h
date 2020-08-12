@@ -35,6 +35,8 @@ private:
     juce::Slider mixValueSlider;
     juce::Label delayLabel;
     juce::Label feedbackLabel;
+    juce::Label mixLabel;
+    juce::Label clipLabel;
     
     juce::Rectangle<float> area;
 public:
