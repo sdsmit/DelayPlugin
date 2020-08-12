@@ -24,13 +24,12 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     setSize (400, 300);
     addAndMakeVisible(delayValueSlider);
     addAndMakeVisible(delayLabel);
-    delayLabel.attachToComponent(&delayValueSlider, false);
-    delayLabel.setColour(0, juce::Colours::black);
     delayLabel.setText("delay time", juce::NotificationType::dontSendNotification);
     delayValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     delayValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
     delayValueSlider.setTextValueSuffix("ms");
     delayValueSlider.setRange(0, 2000);
+    delayLabel.attachToComponent(&delayValueSlider, false);
     
     addAndMakeVisible(feedbackValueSlider);
     feedbackValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
