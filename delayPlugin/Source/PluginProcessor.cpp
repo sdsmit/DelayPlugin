@@ -151,39 +151,17 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         const float* delayBufferData = mDelayBuffer.getReadPointer(channel);
         float * dryBuffer = buffer.getWritePointer(channel);
         
-        
-        saturate(buffer, channel, bufferLength, bufferData, .5, .8);
         fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData, true);
         
         getFromDelayBuffer(buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData, false);
         if (*treeState.getRawParameterValue(MIX_ID) != 0) {
         feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
         }
-        
     }
-
     
     mWritePosition += bufferLength;
     //wrap around when we get to the end of delay buffer
     mWritePosition = mWritePosition % delayBufferLength;
-}
-
-void DelayPluginAudioProcessor::saturate(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const float * bufferData, float saturation, float saturationThreshold) {
-    float gainStage1;
-    for (int i = 0; i < bufferLength; i++) {
-        gainStage1 = *bufferData;
-        if (abs(gainStage1) > saturationThreshold + .1) {
-            gainStage1 = sin(gainStage1) + saturation;
-        }
-        if (abs(gainStage1) > saturationThreshold + .2) {
-            gainStage1 = .2 * sin(gainStage1) + saturation;
-        }
-        if (abs(gainStage1) > saturationThreshold + .3) {
-            gainStage1 = .2 * sin(gainStage1) + saturation;
-        }
-        buffer.addSample(channel, i, gainStage1);
-        bufferData++;
-    }
 }
 
 void DelayPluginAudioProcessor::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData, bool willReplace) {
