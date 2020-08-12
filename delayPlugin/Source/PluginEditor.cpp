@@ -37,13 +37,11 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     
     addAndMakeVisible(mixValueSlider);
     mixValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
-    mixValueSlider.setTextValueSuffix("%");
     mixValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
     mixValueSlider.setRange(0, 1);
     
     addAndMakeVisible(clipThresholdSlider);
     clipThresholdSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
-    clipThresholdSlider.setTextValueSuffix("%");
     clipThresholdSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
     clipThresholdSlider.setRange(0, 1);
     clipThresholdSlider.setValue(1);
@@ -77,7 +75,7 @@ DelayPluginAudioProcessorEditor::~DelayPluginAudioProcessorEditor()
 //==============================================================================
 void DelayPluginAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    g.setColour(juce::Colours::lightgrey);
+    g.setColour(juce::Colours::black);
     g.fillRect(area);
 }
 
