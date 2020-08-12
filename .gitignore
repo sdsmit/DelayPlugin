@@ -1,6 +1,4 @@
 
-*Builds
-*DS_Store
-*delayPlugin.jucer
-*JuceLibraryCode
+**/Builds
+**/include_juce
 *.xcscheme
