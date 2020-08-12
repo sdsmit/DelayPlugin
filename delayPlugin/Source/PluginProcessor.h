@@ -40,7 +40,7 @@ public:
     void fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData);
     void getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float * bufferData, const float* delayBufferData);
     void feedbackDelay(int channel, const int bufferLength, const int delayBufferLength, float * dryBuffer);
-    void saturate(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const float * bufferData, float clipThreshold);
+    void saturate(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const float * bufferData);
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;

@@ -19,9 +19,13 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     
     mixValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.treeState, MIX_ID, mixValueSlider);
     
+    clipThresholdValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.treeState, CLIP_ID, clipThresholdSlider);
+    
     setSize (400, 300);
     addAndMakeVisible(delayValueSlider);
     addAndMakeVisible(delayLabel);
+    delayLabel.attachToComponent(&delayValueSlider, false);
+    delayLabel.setColour(0, juce::Colours::black);
     delayLabel.setText("delay time", juce::NotificationType::dontSendNotification);
     delayValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     delayValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
@@ -45,6 +49,7 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     clipThresholdSlider.setTextValueSuffix("%");
     clipThresholdSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
     clipThresholdSlider.setRange(0, 1);
+    clipThresholdSlider.setValue(1);
 }
 
 DelayPluginAudioProcessorEditor::~DelayPluginAudioProcessorEditor()
@@ -54,12 +59,13 @@ DelayPluginAudioProcessorEditor::~DelayPluginAudioProcessorEditor()
 //==============================================================================
 void DelayPluginAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
+    g.setColour(juce::Colours::lightgrey);
+    g.fillRect(area);
 }
 
 void DelayPluginAudioProcessorEditor::resized()
 {
-    delayLabel.setBounds(0, getHeight(), getWidth()/4, getHeight() / 5);
+    area.setBounds(0, 0, getWidth(), getHeight());
     delayValueSlider.setBounds(0, 0, getWidth() / 4, getHeight());
     feedbackValueSlider.setBounds(getWidth()/4, 0, getWidth()/4, getHeight());
     mixValueSlider.setBounds(getWidth()/4 * 2, 0, getWidth()/4, getHeight());

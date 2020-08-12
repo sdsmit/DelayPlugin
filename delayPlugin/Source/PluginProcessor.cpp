@@ -21,7 +21,7 @@ DelayPluginAudioProcessor::DelayPluginAudioProcessor()
                      #endif
                        ),
 treeState(*this, nullptr, "PARAMETERS", {std::make_unique<juce::AudioParameterInt>(DELAY_TIME_ID, DELAY_TIME_NAME, 0, 2000, 0), std::make_unique<juce::AudioParameterFloat>(FEEDBACK_LEVEL_ID, FEEDBACK_LEVEL_NAME, 0, 1, 0), std::make_unique<juce::AudioParameterFloat>(MIX_ID, MIX_NAME, 0, 1, 0),
-    std::make_unique<juce::AudioParameterFloat>(CLIP_ID, CLIP_NAME, 0, 1, 0)
+    std::make_unique<juce::AudioParameterFloat>(CLIP_ID, CLIP_NAME, 0, 1, 1)
 })
 #endif
 {
@@ -158,8 +158,7 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         if (*treeState.getRawParameterValue(MIX_ID) != 0) {
         feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
         }
-        auto clipThreshold = float(*treeState.getRawParameterValue(CLIP_ID));
-        saturate(buffer, channel, bufferLength, bufferData, clipThreshold);
+        saturate(buffer, channel, bufferLength, bufferData);
     }
     
     mWritePosition += bufferLength;
@@ -211,21 +210,18 @@ void DelayPluginAudioProcessor::feedbackDelay(int channel, const int bufferLengt
     }
 }
 
-void DelayPluginAudioProcessor::saturate(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const float * bufferData, float clipThreshold) {
+void DelayPluginAudioProcessor::saturate(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const float * bufferData) {
     for (int i = 0; i < bufferLength; i++) {
         float newVal = 0;
-        float clipThresholdT2 = clipThreshold * 2;
-        float n = clipThreshold * 2.5;
-        
-        newVal = (*bufferData)/pow((1 + pow(abs((*bufferData)), n)), (1/n));
-        //soft clipping stage
-        if (newVal <= -clipThreshold) {
+        auto clipThreshold = float(*treeState.getRawParameterValue(CLIP_ID));
+
+        if (*bufferData <= -clipThreshold) {
             newVal = -2/3;
         }
-        else if (newVal > -clipThreshold && newVal < clipThreshold) {
-            newVal = newVal - (pow(newVal, 3)/3);
+        else if (*bufferData > -clipThreshold && *bufferData < clipThreshold) {
+            newVal = *bufferData - (pow(*bufferData, 3)/3);
         }
-        else if (newVal >= clipThreshold) {
+        else if (*bufferData >= clipThreshold) {
             newVal = 2/3;
         }
         buffer.addSample(channel, i, newVal);
