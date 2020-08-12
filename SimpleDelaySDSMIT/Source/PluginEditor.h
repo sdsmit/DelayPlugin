@@ -15,6 +15,20 @@
 //==============================================================================
 /**
 */
+class OtherLookAndFeel : public juce::LookAndFeel_V4 {
+public:
+    OtherLookAndFeel() {
+        getTypefaceForFont(getBluFont());
+    }
+    static const juce::Font& getBluFont()
+    {
+        static juce::Font blu (juce::Font (juce::Typeface::createSystemTypefaceFor (BinaryData::BluuNextBold_otf,
+                                                                    BinaryData::BluuNextBold_otfSize)));
+        return blu;
+    }
+};
+
+
 class DelayPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
@@ -39,6 +53,8 @@ private:
     juce::Label clipLabel;
     
     juce::Rectangle<float> area;
+    
+    OtherLookAndFeel otherLookAndFeel;
 public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delayTimeValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> feedbackTimeValue;

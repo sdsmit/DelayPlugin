@@ -46,6 +46,10 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     clipThresholdSlider.setRange(0, 1);
     clipThresholdSlider.setValue(1);
     
+    mixLabel.setFont(otherLookAndFeel.getBluFont());
+    feedbackLabel.setFont(otherLookAndFeel.getBluFont());
+    delayLabel.setFont(otherLookAndFeel.getBluFont());
+    clipLabel.setFont(otherLookAndFeel.getBluFont());
     
     addAndMakeVisible(mixLabel);
     mixLabel.attachToComponent(&mixValueSlider, false);
