@@ -1,4 +1,10 @@
-
-**/Builds
-**/include_juce
+*.app
+*.component
+*.DS_Store
+*.vst3
+*.a
+*.jucer
+*.plist
+*.nib
+*.xcodeproj
 *.xcscheme
