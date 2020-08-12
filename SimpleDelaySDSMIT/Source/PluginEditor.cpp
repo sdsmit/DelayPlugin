@@ -70,6 +70,16 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     clipLabel.attachToComponent(&clipThresholdSlider, false);
     clipLabel.setText("clip threshold", juce::NotificationType::dontSendNotification);
     clipLabel.setJustificationType(juce::Justification::centred);
+    
+    addAndMakeVisible(preButton);
+    preButton.setButtonText("pre");
+    preButton.setClickingTogglesState(true);
+    preButton.setConnectedEdges(8);
+    
+    addAndMakeVisible(postButton);
+    postButton.setButtonText("post");
+    postButton.setClickingTogglesState(true);
+    postButton.setConnectedEdges(4);
 }
 
 DelayPluginAudioProcessorEditor::~DelayPluginAudioProcessorEditor()
@@ -104,6 +114,9 @@ void DelayPluginAudioProcessorEditor::resized()
     juce::Rectangle<int> clipArea;
     clipArea.setBounds(getWidth()/2 + border, getHeight()/2 + border, getWidth()/2 - border * 2, getHeight()/2 - border * 2);
     clipThresholdSlider.setBounds(clipArea);
+    
+    preButton.setBounds(getWidth() - border * 2, getHeight() / 2 +  border, border * 2, border);
+    postButton.setBounds(getWidth() - border * 2, getHeight() / 2 + (2 * border), border * 2, border);
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 }

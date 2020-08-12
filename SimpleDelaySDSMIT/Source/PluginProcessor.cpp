@@ -153,13 +153,20 @@ void DelayPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         const float* delayBufferData = mDelayBuffer.getReadPointer(channel);
         float * dryBuffer = buffer.getWritePointer(channel);
         
+        if (pre) {
+            saturate(buffer, channel, bufferLength, bufferData);
+        }
+        
         fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
         
         getFromDelayBuffer(buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
         if (*treeState.getRawParameterValue(MIX_ID) != 0) {
         feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
         }
-        saturate(buffer, channel, bufferLength, bufferData);
+        
+        if (post) {
+         saturate(buffer, channel, bufferLength, bufferData);
+        }
     }
     
     mWritePosition += bufferLength;

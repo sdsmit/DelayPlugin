@@ -29,7 +29,8 @@ public:
 };
 
 
-class DelayPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
+class DelayPluginAudioProcessorEditor  : public juce::AudioProcessorEditor,
+public juce::Button::Listener
 {
 public:
     DelayPluginAudioProcessorEditor (DelayPluginAudioProcessor&);
@@ -38,6 +39,25 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    
+    void buttonClicked (juce::Button* button) override {
+        if (button == &preButton) {
+            if (audioProcessor.pre == false) {
+                audioProcessor.pre = true;
+            }
+            else {
+                audioProcessor.pre = false;
+            }
+        }
+        else if (button == &postButton) {
+            if (audioProcessor.post == false) {
+                audioProcessor.post = true;
+            }
+            else {
+                audioProcessor.post = false;
+            }
+        }
+    }
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -52,6 +72,9 @@ private:
     juce::Label mixLabel;
     juce::Label clipLabel;
     
+    juce::TextButton preButton;
+    juce::TextButton postButton;
+    
     juce::Rectangle<float> area;
     
     OtherLookAndFeel otherLookAndFeel;
@@ -60,5 +83,6 @@ public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> feedbackTimeValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> clipThresholdValue;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayPluginAudioProcessorEditor)
 };
