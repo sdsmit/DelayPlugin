@@ -72,7 +72,6 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     clipLabel.setJustificationType(juce::Justification::centred);
     
     addAndMakeVisible(preButton);
-    preButton.setLookAndFeel(&otherLookAndFeel);
     preButton.setButtonText("pre");
     preButton.setClickingTogglesState(true);
     preButton.setConnectedEdges(8);
@@ -80,12 +79,13 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     preButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::red);
     
     addAndMakeVisible(postButton);
-    postButton.setLookAndFeel(&otherLookAndFeel);
     postButton.setButtonText("post");
     postButton.setClickingTogglesState(true);
     postButton.setConnectedEdges(4);
     postButton.setColour(juce::TextButton::buttonColourId, juce::Colours::black);
     postButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::red);
+    
+    otherLookAndFeel.setDefaultLookAndFeel(nullptr);
 }
 
 DelayPluginAudioProcessorEditor::~DelayPluginAudioProcessorEditor()

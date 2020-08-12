@@ -78,6 +78,7 @@ private:
     juce::Rectangle<float> area;
     
     OtherLookAndFeel otherLookAndFeel;
+    juce::LookAndFeel_V4 thisLookAndFeel;
 public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delayTimeValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> feedbackTimeValue;
