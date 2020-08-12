@@ -4,11 +4,12 @@ A delay plug in built by Sam Smith - sdsmit@umich.edu
 
 ## Usage 
 
-Build with the projucer in xcode/vscode. Load in DAW or run as stand alone app. 
+option 1: Build with the projucer in xcode/vscode via source and projucer. 
+option 2: Download the VST3/AU files in the builds/release folder. 
 
 ## Features
 
-Delay time, Feedback amount, Delay gain, and Soft Clipping Threshold.
+Delay time, Feedback amount, Delay gain, and Soft Clipping Threshold (with pre/post controls).
 
 ## TO-DO
 
