@@ -25,24 +25,24 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     setSize (400, 300);
     addAndMakeVisible(delayValueSlider);
     delayValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
-    delayValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
+    delayValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 70, 20);
     delayValueSlider.setTextValueSuffix("ms");
     delayValueSlider.setRange(0, 2000);
     
     addAndMakeVisible(feedbackValueSlider);
     feedbackValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     feedbackValueSlider.setTextValueSuffix("%");
-    feedbackValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
+    feedbackValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 70, 20);
     feedbackValueSlider.setRange(0, 1);
     
     addAndMakeVisible(mixValueSlider);
     mixValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
-    mixValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
+    mixValueSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 70, 20);
     mixValueSlider.setRange(0, 1);
     
     addAndMakeVisible(clipThresholdSlider);
     clipThresholdSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
-    clipThresholdSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 20);
+    clipThresholdSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 70, 20);
     clipThresholdSlider.setRange(0, 1);
     clipThresholdSlider.setValue(1);
     
@@ -72,14 +72,20 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     clipLabel.setJustificationType(juce::Justification::centred);
     
     addAndMakeVisible(preButton);
+    preButton.setLookAndFeel(&otherLookAndFeel);
     preButton.setButtonText("pre");
     preButton.setClickingTogglesState(true);
     preButton.setConnectedEdges(8);
+    preButton.setColour(juce::TextButton::buttonColourId, juce::Colours::black);
+    preButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::red);
     
     addAndMakeVisible(postButton);
+    postButton.setLookAndFeel(&otherLookAndFeel);
     postButton.setButtonText("post");
     postButton.setClickingTogglesState(true);
     postButton.setConnectedEdges(4);
+    postButton.setColour(juce::TextButton::buttonColourId, juce::Colours::black);
+    postButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::red);
 }
 
 DelayPluginAudioProcessorEditor::~DelayPluginAudioProcessorEditor()
@@ -115,8 +121,8 @@ void DelayPluginAudioProcessorEditor::resized()
     clipArea.setBounds(getWidth()/2 + border, getHeight()/2 + border, getWidth()/2 - border * 2, getHeight()/2 - border * 2);
     clipThresholdSlider.setBounds(clipArea);
     
-    preButton.setBounds(getWidth() - border * 2, getHeight() / 2 +  border, border * 2, border);
-    postButton.setBounds(getWidth() - border * 2, getHeight() / 2 + (2 * border), border * 2, border);
+    preButton.setBounds(getWidth() - border* 2, getHeight() / 2 +  border, border * 1.5, border);
+    postButton.setBounds(getWidth() - border * 2, getHeight() / 2 + (2 * border), border * 1.5, border);
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 }
