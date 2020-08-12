@@ -1,10 +1,15 @@
-*.app
-*.component
-*.DS_Store
-*.vst3
-*.a
-*.jucer
-*.plist
-*.nib
-*.xcodeproj
-*.xcscheme
+# Blacklist files/folders in same directory as the .gitignore file
+/*
+
+# Whitelist some files
+!.gitignore
+
+# Ignore all files named .DS_Store or ending with .log
+**/.DS_Store
+**.log
+
+# Whitelist folder/a/b1/ and folder/a/b2/
+# trailing "/" is optional for folders, may match file though.
+# "/" is NOT optional when followed by a *
+!delayPlugin/source/
+delayPlugin/source/*
