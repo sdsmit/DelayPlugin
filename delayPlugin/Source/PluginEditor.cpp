@@ -65,6 +65,7 @@ void DelayPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
 void DelayPluginAudioProcessorEditor::resized()
 {
+    delayLabel.setBounds(getLocalBounds());
     area.setBounds(0, 0, getWidth(), getHeight());
     delayValueSlider.setBounds(0, 0, getWidth() / 4, getHeight());
     feedbackValueSlider.setBounds(getWidth()/4, 0, getWidth()/4, getHeight());

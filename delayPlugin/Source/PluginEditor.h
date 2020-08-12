@@ -15,8 +15,7 @@
 //==============================================================================
 /**
 */
-class DelayPluginAudioProcessorEditor  : public juce::AudioProcessorEditor,
-                                        public juce::Slider::Listener
+class DelayPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
     DelayPluginAudioProcessorEditor (DelayPluginAudioProcessor&);
