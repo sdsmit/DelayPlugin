@@ -19,6 +19,7 @@ class OtherLookAndFeel : public juce::LookAndFeel_V4 {
 public:
     OtherLookAndFeel() {
         getTypefaceForFont(getBluFont());
+        
     }
     static const juce::Font& getBluFont()
     {

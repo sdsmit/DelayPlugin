@@ -22,6 +22,11 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
     
     clipThresholdValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.treeState, CLIP_ID, clipThresholdSlider);
     
+    setLookAndFeel(&otherLookAndFeel);
+    
+    otherLookAndFeel.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::red);
+    otherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::grey);
+    
     setSize (400, 300);
     addAndMakeVisible(delayValueSlider);
     delayValueSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
@@ -90,6 +95,7 @@ DelayPluginAudioProcessorEditor::DelayPluginAudioProcessorEditor (DelayPluginAud
 
 DelayPluginAudioProcessorEditor::~DelayPluginAudioProcessorEditor()
 {
+    setLookAndFeel (nullptr);
 }
 
 //==============================================================================
